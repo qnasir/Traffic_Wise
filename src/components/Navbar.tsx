@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import NotificationCenter from "./NotificationCenter";
+import AreaSubscription from "./AreaSubscription";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +26,7 @@ import {
 
 function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
   const [user, setUser] = useState<{ name: string } | null>({
     name: "Abdul Nasir Qureshi",
   });
@@ -72,7 +74,7 @@ function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             {isAuthenticated ? (
               <>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={()=>setShowSubscribeDialog(true)}>
                   <MapPin className="h-4 w-4 mr-2" />
                   Subscribe to Area
                 </Button>
@@ -85,7 +87,7 @@ function Navbar() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="realative h-8 w-8 rounded-full"
+                      className="relative h-8 w-8 rounded-full"
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="bg-primary text-primary-foreground text-xs">
@@ -114,7 +116,7 @@ function Navbar() {
                       <User className="mr-2 h-4 w-4" />
                       <span>My Profile</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={()=>setShowSubscribeDialog(true)}>
                       <Bell className="mr-2 h-4 w-4" />
                       <span>Manage Alerts</span>
                     </DropdownMenuItem>
@@ -161,7 +163,7 @@ function Navbar() {
 
       {/* Mobile Menu */}
       {showMobileMenu && (
-        <div className="md:hidden border-t border=gray-100 dark:border-gray-800">
+        <div className="md:hidden border-t border-gray-100 dark:border-gray-800">
           <div className="container mx-auto px-4 py-4 space-y-3">
             <Link to="/" onClick={() => setShowMobileMenu(false)}>
               <Button
@@ -232,6 +234,7 @@ function Navbar() {
                     className="w-full justify-start"
                     onClick={() => {
                       setShowMobileMenu(false);
+                      setShowSubscribeDialog(true);
                     }}
                   >
                     <MapPin className="h-4 w-4 mr-2" />
@@ -286,6 +289,9 @@ function Navbar() {
           </div>
         </div>
       )}
+
+      {/* Area Subscribtion Dialog */}
+      <AreaSubscription isOpen={showSubscribeDialog} onOpenChange={setShowSubscribeDialog} />
     </header>
   );
 }
