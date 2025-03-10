@@ -2,13 +2,54 @@ import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Map from "@/components/Map";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Badge } from '@/components/ui/badge';
+import { Search, AlertTriangle, Construction, Car, Filter } from 'lucide-react';
+
 import {Button} from "@/components/ui/button"
-import { AlertTriangle } from "lucide-react";
+import AlertCard from "@/components/AlertCard";
 
 const Index = () => {
   const [showHeroSection, setShowHeroSection] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<string>('all');
+  const [filterSeverity, setFilterSeverity] = useState<string | null>(null);
+
+  const filteredReports = [
+    {
+      id: 1,
+      title: "Road Blocked",
+      location: {
+        lat: 40.7128,
+        lng: -74.006,
+        address: "123 Main St, New York, NY",
+      },
+      severity: "high",
+    },
+    {
+      id: 2,
+      title: "Minor Accident",
+      location: {
+        lat: 34.0522,
+        lng: -118.2437,
+        address: "456 Sunset Blvd, Los Angeles, CA",
+      },
+      severity: "medium",
+    },
+    {
+      id: 3,
+      title: "Pothole",
+      location: {
+        lat: 41.8781,
+        lng: -87.6298,
+        address: "789 Lakeshore Dr, Chicago, IL",
+      },
+      severity: "low",
+    },
+  ];
 
 
   const handleReportClick = () => {
@@ -66,6 +107,120 @@ const Index = () => {
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent z-20"></div>
+      </section>
+
+      {/* Reports Section */}
+      <section id="reports" className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 animate-fade-up">
+            <h2 className="text-3xl font-bold mb-4">Recent Traffic & Safety Reports</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Stay informed about road conditions with real-time updates from other drivers in your area.
+            </p>
+          </div>
+          
+          {/* Search and Filter Section */}
+          <div className="mb-8 flex flex-col md:flex-row gap-4 items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search reports..."
+                className="pl-10 glass-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+                <Filter className="h-4 w-4 mr-1" />
+                Severity:
+              </span>
+              
+              <Badge 
+                variant="outline"
+                className={`cursor-pointer ${!filterSeverity ? 'bg-primary/10 text-primary' : ''}`}
+              >
+                All
+              </Badge>
+              <Badge 
+                variant="outline"
+                className={`cursor-pointer ${filterSeverity === 'low' ? 'bg-alert-low/20 text-alert-low border-alert-low/30' : ''}`}
+              >
+                <div className="w-2 h-2 rounded-full bg-alert-low mr-1"></div>
+                Low
+              </Badge>
+              <Badge 
+                variant="outline"
+                className={`cursor-pointer ${filterSeverity === 'medium' ? 'bg-alert-medium/20 text-alert-medium border-alert-medium/30' : ''}`}
+              >
+                <div className="w-2 h-2 rounded-full bg-alert-medium mr-1"></div>
+                Medium
+              </Badge>
+              <Badge 
+                variant="outline"
+                className={`cursor-pointer ${filterSeverity === 'high' ? 'bg-alert-high/20 text-alert-high border-alert-high/30' : ''}`}
+              >
+                <div className="w-2 h-2 rounded-full bg-alert-high mr-1"></div>
+                High
+              </Badge>
+            </div>
+          </div>
+          
+          {/* Tabs for report types */}
+          <Tabs defaultValue="all" value={activeTab} className="mb-8">
+            <TabsList className="grid grid-cols-5 md:w-[600px] mx-auto">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="accident" className="flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                <span>Accidents</span>
+              </TabsTrigger>
+              <TabsTrigger value="pothole" className="flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                <span>Potholes</span>
+              </TabsTrigger>
+              <TabsTrigger value="traffic" className="flex items-center gap-1">
+                <Car className="h-3 w-3" />
+                <span>Traffic</span>
+              </TabsTrigger>
+              <TabsTrigger value="construction" className="flex items-center gap-1">
+                <Construction className="h-3 w-3" />
+                <span>Construction</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
+          {/* Reports Grid */}
+          {filteredReports.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredReports.map((report) => (
+                <div key={report.id} className="animate-fade-up">
+                  <AlertCard />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-100 dark:bg-gray-800 rounded-xl">
+              <AlertTriangle className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-medium mb-2">No reports found</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {searchQuery 
+                  ? 'No reports match your search criteria. Try different keywords.' 
+                  : 'No reports for the selected filter. Try a different category or severity.'}
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSearchQuery('');
+                  setActiveTab('all');
+                  setFilterSeverity(null);
+                }}
+              >
+                Reset Filters
+              </Button>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* How it work Section */}
