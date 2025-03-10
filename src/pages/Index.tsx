@@ -195,7 +195,7 @@ const Index = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredReports.map((report) => (
                 <div key={report.id} className="animate-fade-up">
-                  <AlertCard />
+                  <AlertCard report={report} />
                 </div>
               ))}
             </div>
