@@ -6,11 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Badge } from '@/components/ui/badge';
 import { Search, AlertTriangle, Construction, Car, Filter } from 'lucide-react';
-
+import { useAlerts, ReportType, AlertSeverity } from '@/context/AlertsContext';
 import {Button} from "@/components/ui/button"
 import AlertCard from "@/components/AlertCard";
 
 const Index = () => {
+  const { reports } = useAlerts();
   const [showHeroSection, setShowHeroSection] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -18,39 +19,26 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [filterSeverity, setFilterSeverity] = useState<string | null>(null);
 
-  const filteredReports = [
-    {
-      id: 1,
-      title: "Road Blocked",
-      location: {
-        lat: 40.7128,
-        lng: -74.006,
-        address: "123 Main St, New York, NY",
-      },
-      severity: "high",
-    },
-    {
-      id: 2,
-      title: "Minor Accident",
-      location: {
-        lat: 34.0522,
-        lng: -118.2437,
-        address: "456 Sunset Blvd, Los Angeles, CA",
-      },
-      severity: "medium",
-    },
-    {
-      id: 3,
-      title: "Pothole",
-      location: {
-        lat: 41.8781,
-        lng: -87.6298,
-        address: "789 Lakeshore Dr, Chicago, IL",
-      },
-      severity: "low",
-    },
-  ];
-
+    // Filtered reports based on active tab, search query, and severity filter
+    const filteredReports = reports.filter(report => {
+      // First filter by tab (report type)
+      if (activeTab !== 'all' && report.type !== activeTab) {
+        return false;
+      }
+      
+      // Then filter by search query
+      if (searchQuery && !report.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
+          !report.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      
+      // Finally filter by severity if a filter is selected
+      if (filterSeverity && report.severity !== filterSeverity) {
+        return false;
+      }
+      
+      return true;
+    });
 
   const handleReportClick = () => {
     if (!isAuthenticated) {
