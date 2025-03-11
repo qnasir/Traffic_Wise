@@ -7,9 +7,10 @@ import { Award, FileText } from './DashboardIcons';
 import { Button } from '@/components/ui/button';
 import EmptyState from './EmptyState';
 import { formatDistanceToNow } from 'date-fns';
+import {User} from '../../context/AuthContext'
 
 interface AchievementsTabProps {
-  user: any;
+  user: User | null;
   navigate: NavigateFunction;
 }
 

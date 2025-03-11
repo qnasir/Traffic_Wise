@@ -7,11 +7,14 @@ import { Award, Bell, FileText, MapPin } from './DashboardIcons';
 import StatCard from './StatCard';
 import ReportCard from './ReportCard';
 import EmptyState from './EmptyState';
+import {User} from '../../context/AuthContext'
+import {Report} from '../../context/AlertsContext'
+
 
 interface OverviewTabProps {
-  user: any;
-  userReports: any[];
-  areaReports: any[];
+  user: User | null;
+  userReports: Report[];
+  areaReports: Report[];
   onShowAreaDialog: () => void;
   navigate: NavigateFunction;
 }
