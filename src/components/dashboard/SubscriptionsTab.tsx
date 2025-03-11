@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from '@/components/ui/button';
 import { MapPin } from './DashboardIcons';
 import EmptyState from './EmptyState';
+import {SubscribedArea} from '../../context/AuthContext'
 
 interface SubscriptionsTabProps {
-  subscribedAreas: any[];
+  subscribedAreas: SubscribedArea[];
   onShowAreaDialog: () => void;
 }
 

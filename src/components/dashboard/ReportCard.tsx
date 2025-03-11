@@ -4,9 +4,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, AlertCircle } from './DashboardIcons';
 import { getStatusIcon, statusColorMap } from './DashboardIcons';
+import {Report} from '../../context/AlertsContext'
 
 interface ReportCardProps {
-  report: any;
+  report: Report;
   compact?: boolean;
 }
 

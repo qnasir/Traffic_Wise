@@ -2,10 +2,11 @@
 import React from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { User, Bell } from './DashboardIcons';
+import { User as UserIcon, Bell } from './DashboardIcons';
+import {User} from '../../context/AuthContext'
 
 interface DashboardHeaderProps {
-  user: any;
+  user: User | null;
   onShowProfile: () => void;
   onShowAreaDialog: () => void;
 }
@@ -26,7 +27,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       
       <div className="flex items-center mt-4 md:mt-0 space-x-3">
         <Button onClick={onShowProfile} variant="outline" size="sm">
-          <User className="h-4 w-4 mr-2" />
+          <UserIcon className="h-4 w-4 mr-2" />
           Profile
         </Button>
         <Button onClick={onShowAreaDialog} variant="outline" size="sm">

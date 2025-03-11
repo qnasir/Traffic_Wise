@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { FileText } from './DashboardIcons';
 import ReportCard from './ReportCard';
 import EmptyState from './EmptyState';
+import {Report} from '../../context/AlertsContext'
+
 
 interface ReportsTabProps {
-  userReports: any[];
+  userReports: Report[];
   navigate: NavigateFunction;
 }
 
