@@ -2,43 +2,12 @@ import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useAlerts } from "../context/AlertsContext";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "lucide-react";
 
 const Map = () => {
-    const reports = [
-        {
-          id: 1,
-          title: "Road Blocked",
-          location: {
-            lat: 40.7128,
-            lng: -74.006,
-            address: "123 Main St, New York, NY",
-          },
-          severity: "high",
-        },
-        {
-          id: 2,
-          title: "Minor Accident",
-          location: {
-            lat: 34.0522,
-            lng: -118.2437,
-            address: "456 Sunset Blvd, Los Angeles, CA",
-          },
-          severity: "medium",
-        },
-        {
-          id: 3,
-          title: "Pothole",
-          location: {
-            lat: 41.8781,
-            lng: -87.6298,
-            address: "789 Lakeshore Dr, Chicago, IL",
-          },
-          severity: "low",
-        },
-      ];
-            
+  const { reports } = useAlerts();
   const [userLocation, setUserLocation] = useState(null);
   const mapRef = useRef(null);
 

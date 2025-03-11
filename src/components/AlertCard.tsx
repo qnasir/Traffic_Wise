@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Report, useAlerts, ReportStatus } from '@/context/AlertsContext';
 import { 
   Card, 
@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from '@/context/AuthContext';
 
 interface AlertCardProps {
   report: Report;
@@ -31,7 +32,7 @@ interface AlertCardProps {
 
 const AlertCard: React.FC<AlertCardProps> = ({ report }) => {
   const { upvoteReport, downvoteReport, markAsResolved } = useAlerts();
-  const [ isAuthenticated, setIsAuthenticated ] = useState(true);
+  const { isAuthenticated, user } = useAuth();
 
   // Format the timestamp
   const timeAgo = formatDistanceToNow(new Date(report.reportedAt), { addSuffix: true });
