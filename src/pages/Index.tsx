@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
-import Map from '@/components/Map';
+const Map = React.lazy(() => import('@/components/Map'));
 import AlertCard from '@/components/AlertCard';
 import ReportForm from '@/components/ReportForm';
 import Footer from '@/components/Footer';
@@ -93,7 +93,9 @@ const Index = () => {
       >
         <div className="absolute inset-0 z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent z-10"></div>
-          <Map />
+          <Suspense fallback={<div>Loading Map...</div>}>
+            <Map />
+          </Suspense>
         </div>
         
         <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center text-white">
