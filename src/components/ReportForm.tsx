@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { useAlerts, ReportType, AlertSeverity, Location } from '@/context/AlertsContext';
 import {
   Card,
@@ -36,54 +37,11 @@ interface ReportFormProps {
 }
 
 const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
-  const [ isAuthenticated, setIsAuthenticated ] = useState(true);
+  const { user, isAuthenticated } = useAuth();
   const { addReport } = useAlerts();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const user = [
-    {
-      title: "Flooded Street",
-      description: "The main road is flooded due to heavy rain.",
-      type: "weather", // Adjust based on your ReportType enum
-      severity: "high", // Adjust based on your AlertSeverity enum
-      location: {
-        lat: 40.7128,
-        lng: -74.006,
-        address: "123 Main St, New York, NY",
-      },
-      reportedBy: "user_123",
-      imageUrl: "https://via.placeholder.com/150",
-    },
-    {
-      title: "Power Outage",
-      description: "No electricity in the downtown area since 2 AM.",
-      type: "infrastructure",
-      severity: "medium",
-      location: {
-        lat: 34.0522,
-        lng: -118.2437,
-        address: "456 Sunset Blvd, Los Angeles, CA",
-      },
-      reportedBy: "user_456",
-      imageUrl: "https://via.placeholder.com/150",
-    },
-    {
-      title: "Pothole on Highway",
-      description: "A large pothole causing traffic delays.",
-      type: "road_hazard",
-      severity: "low",
-      location: {
-        lat: 41.8781,
-        lng: -87.6298,
-        address: "789 Lakeshore Dr, Chicago, IL",
-      },
-      reportedBy: "user_789",
-      imageUrl: "https://via.placeholder.com/150",
-    },
-  ];
-  
-  
   
   // Form state
   const [formData, setFormData] = useState({
@@ -391,6 +349,8 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
       </Card>
       
       <AuthDialog
+        isOpen={authDialogOpen}
+        onOpenChange={setAuthDialogOpen}
       />
     </>
   );
