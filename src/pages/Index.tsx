@@ -1,45 +1,75 @@
-import React, { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Map from "@/components/Map";
+
+import React, { useState, useEffect } from 'react';
+import Navbar from '@/components/Navbar';
+import Map from '@/components/Map';
+import AlertCard from '@/components/AlertCard';
+import ReportForm from '@/components/ReportForm';
+import Footer from '@/components/Footer';
+import AuthDialog from '@/components/AuthDialog';
+import { useAlerts, ReportType, AlertSeverity } from '@/context/AlertsContext';
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Badge } from '@/components/ui/badge';
 import { Search, AlertTriangle, Construction, Car, Filter } from 'lucide-react';
-import { useAlerts, ReportType, AlertSeverity } from '@/context/AlertsContext';
-import {Button} from "@/components/ui/button"
-import AlertCard from "@/components/AlertCard";
-import ReportForm from "@/components/ReportForm";
+import { toast } from 'sonner';
 
 const Index = () => {
   const { reports } = useAlerts();
-  const [showHeroSection, setShowHeroSection] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const { isAuthenticated } = useAuth();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string>('all');
   const [filterSeverity, setFilterSeverity] = useState<string | null>(null);
+  const [showHeroSection, setShowHeroSection] = useState(true);
 
-    // Filtered reports based on active tab, search query, and severity filter
-    const filteredReports = reports.filter(report => {
-      // First filter by tab (report type)
-      if (activeTab !== 'all' && report.type !== activeTab) {
-        return false;
-      }
-      
-      // Then filter by search query
-      if (searchQuery && !report.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
-          !report.description.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
-      }
-      
-      // Finally filter by severity if a filter is selected
-      if (filterSeverity && report.severity !== filterSeverity) {
-        return false;
-      }
-      
-      return true;
-    });
+  // Check if user is at the top of the page
+  useEffect(() => {
+    const handleScroll = () => {
+      const isAtTop = window.scrollY < 100;
+      setShowHeroSection(isAtTop);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Filtered reports based on active tab, search query, and severity filter
+  const filteredReports = reports.filter(report => {
+    // First filter by tab (report type)
+    if (activeTab !== 'all' && report.type !== activeTab) {
+      return false;
+    }
+    
+    // Then filter by search query
+    if (searchQuery && !report.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
+        !report.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    
+    // Finally filter by severity if a filter is selected
+    if (filterSeverity && report.severity !== filterSeverity) {
+      return false;
+    }
+    
+    return true;
+  });
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    toast.info(`Showing ${value === 'all' ? 'all reports' : `${value} reports`}`);
+  };
+
+  const handleSeverityFilter = (severity: AlertSeverity | null) => {
+    setFilterSeverity(severity);
+    
+    if (severity) {
+      toast.info(`Filtered by ${severity} severity`);
+    } else {
+      toast.info('All severities shown');
+    }
+  };
 
   const handleReportClick = () => {
     if (!isAuthenticated) {
@@ -52,16 +82,20 @@ const Index = () => {
       }
     }
   };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-
+      
       {/* Hero Section with Map Overlay */}
-      <section className={`relative transition-all duration-300 ${showHeroSection ? 'h-[100vh] opacity-100' : 'h-[100vh] opacity-95'}`}>
+      <section 
+        className={`relative transition-all duration-300 ${showHeroSection ? 'h-[100vh] opacity-100' : 'h-[100vh] opacity-95'}`}
+      >
         <div className="absolute inset-0 z-10">
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent z-10"></div>
           <Map />
         </div>
+        
         <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center text-white">
           <div className="max-w-3xl animate-fade-up">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
@@ -95,9 +129,10 @@ const Index = () => {
             </div>
           </div>
         </div>
+        
         <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent z-20"></div>
       </section>
-
+      
       {/* Reports Section */}
       <section id="reports" className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
@@ -129,12 +164,14 @@ const Index = () => {
               <Badge 
                 variant="outline"
                 className={`cursor-pointer ${!filterSeverity ? 'bg-primary/10 text-primary' : ''}`}
+                onClick={() => handleSeverityFilter(null)}
               >
                 All
               </Badge>
               <Badge 
                 variant="outline"
                 className={`cursor-pointer ${filterSeverity === 'low' ? 'bg-alert-low/20 text-alert-low border-alert-low/30' : ''}`}
+                onClick={() => handleSeverityFilter('low')}
               >
                 <div className="w-2 h-2 rounded-full bg-alert-low mr-1"></div>
                 Low
@@ -142,6 +179,7 @@ const Index = () => {
               <Badge 
                 variant="outline"
                 className={`cursor-pointer ${filterSeverity === 'medium' ? 'bg-alert-medium/20 text-alert-medium border-alert-medium/30' : ''}`}
+                onClick={() => handleSeverityFilter('medium')}
               >
                 <div className="w-2 h-2 rounded-full bg-alert-medium mr-1"></div>
                 Medium
@@ -149,6 +187,7 @@ const Index = () => {
               <Badge 
                 variant="outline"
                 className={`cursor-pointer ${filterSeverity === 'high' ? 'bg-alert-high/20 text-alert-high border-alert-high/30' : ''}`}
+                onClick={() => handleSeverityFilter('high')}
               >
                 <div className="w-2 h-2 rounded-full bg-alert-high mr-1"></div>
                 High
@@ -157,7 +196,7 @@ const Index = () => {
           </div>
           
           {/* Tabs for report types */}
-          <Tabs defaultValue="all" value={activeTab} className="mb-8">
+          <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange} className="mb-8">
             <TabsList className="grid grid-cols-5 md:w-[600px] mx-auto">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="accident" className="flex items-center gap-1">
@@ -211,9 +250,9 @@ const Index = () => {
           )}
         </div>
       </section>
-
-            {/* Report Form Section */}
-            <section id="report-section" className="py-16">
+      
+      {/* Report Form Section */}
+      <section id="report-section" className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Report a Road Issue</h2>
@@ -227,8 +266,8 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* How it work Section */}
+      
+      {/* How It Works Section */}
       <section id="about" className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -237,7 +276,7 @@ const Index = () => {
               A community-driven platform helping drivers navigate roads safely.
             </p>
           </div>
-
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="neo-card text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -245,54 +284,44 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-semibold mb-3">Report Issues</h3>
               <p className="text-gray-600 dark:text-gray-400">
-                Quickly report road hazards, traffic jams, accidents, or
-                construction with your mobile device.
+                Quickly report road hazards, traffic jams, accidents, or construction with your mobile device.
               </p>
             </div>
-
+            
             <div className="neo-card text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-primary"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                 </svg>
               </div>
               <h3 className="text-xl font-semibold mb-3">Get Alerts</h3>
               <p className="text-gray-600 dark:text-gray-400">
-                Receive real-time notifications about nearby road conditions and
-                hazards while driving.
+                Receive real-time notifications about nearby road conditions and hazards while driving.
               </p>
             </div>
-
+            
             <div className="neo-card text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-primary"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                    clipRule="evenodd"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                 </svg>
               </div>
               <h3 className="text-xl font-semibold mb-3">Drive Safer</h3>
               <p className="text-gray-600 dark:text-gray-400">
-                Make informed decisions, avoid hazards, and contribute to safer
-                roads for everyone.
+                Make informed decisions, avoid hazards, and contribute to safer roads for everyone.
               </p>
             </div>
           </div>
         </div>
       </section>
+      
       <Footer />
+      
+      {/* Auth Dialog */}
+      <AuthDialog 
+        isOpen={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+      />
     </div>
   );
 };
