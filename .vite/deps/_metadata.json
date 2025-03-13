@@ -1,40 +1,73 @@
 {
-  "hash": "8b15b523",
+  "hash": "0f2b4e20",
   "configHash": "c75ef34a",
-  "lockfileHash": "66e4113c",
-  "browserHash": "b7b9178d",
+  "lockfileHash": "1a9f8910",
+  "browserHash": "43d15529",
   "optimized": {
     "react/jsx-dev-runtime": {
       "src": "../../node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "2248e2e0",
+      "fileHash": "8408a83f",
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "6721ba98",
+      "fileHash": "0ae4bd23",
       "needsInterop": true
     },
     "@tanstack/react-query": {
       "src": "../../node_modules/@tanstack/react-query/build/modern/index.js",
       "file": "@tanstack_react-query.js",
-      "fileHash": "3044bad1",
+      "fileHash": "d19f3956",
       "needsInterop": false
     },
     "react-router-dom": {
       "src": "../../node_modules/react-router-dom/dist/index.js",
       "file": "react-router-dom.js",
-      "fileHash": "772b017b",
+      "fileHash": "3715e052",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "775aca22",
+      "needsInterop": true
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "de33825b",
+      "needsInterop": false
+    },
+    "sonner": {
+      "src": "../../node_modules/sonner/dist/index.mjs",
+      "file": "sonner.js",
+      "fileHash": "a23aab71",
+      "needsInterop": false
+    },
+    "recharts": {
+      "src": "../../node_modules/recharts/es6/index.js",
+      "file": "recharts.js",
+      "fileHash": "0c2b515c",
+      "needsInterop": false
+    },
+    "date-fns": {
+      "src": "../../node_modules/date-fns/index.mjs",
+      "file": "date-fns.js",
+      "fileHash": "683dfdcf",
       "needsInterop": false
     }
   },
   "chunks": {
-    "chunk-XUMYNYTV": {
-      "file": "chunk-XUMYNYTV.js"
+    "chunk-PV7ZWGTI": {
+      "file": "chunk-PV7ZWGTI.js"
     },
-    "chunk-MRF63CFJ": {
-      "file": "chunk-MRF63CFJ.js"
+    "chunk-2CLD7BNN": {
+      "file": "chunk-2CLD7BNN.js"
+    },
+    "chunk-WOOG5QLI": {
+      "file": "chunk-WOOG5QLI.js"
     }
   }
 }

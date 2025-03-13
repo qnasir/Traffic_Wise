@@ -69,7 +69,7 @@ const initialReports: Report[] = [
     resolved: false,
     status: 'accepted',
     lastUpdated: new Date(Date.now() - 3000000),
-    imageUrl: 'https://images.unsplash.com/photo-1598521101189-ba9f370f51d4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cG90aG9sZXxlbnwwfHwwfHx8MA%3D%3D'
+    imageUrl: 'https://www.shutterstock.com/image-photo/hailsham-east-sussex-uk-january-600nw-2425809705.jpg'
   },
   {
     id: '2',
@@ -85,7 +85,7 @@ const initialReports: Report[] = [
     resolved: false,
     status: 'in_progress',
     lastUpdated: new Date(Date.now() - 1500000),
-    imageUrl: 'https://images.unsplash.com/photo-1599778150143-a1fbf73a854b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8dHJhZmZpYyUyMGNyYXNofGVufDB8fDB8fHww'
+    imageUrl: 'https://imengine.prod.srp.navigacloud.com/?uuid=91c9fbe6-0edd-50a9-bbbb-b71a3c508dff&type=primary&q=75&width=1024'
   },
   {
     id: '3',
@@ -101,7 +101,7 @@ const initialReports: Report[] = [
     resolved: false,
     status: 'pending',
     lastUpdated: new Date(Date.now() - 900000),
-    imageUrl: 'https://images.unsplash.com/photo-1551608169-1dc1b9d29d17?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8dHJhZmZpYyUyMGphbXxlbnwwfHwwfHx8MA%3D%3D'
+    imageUrl: 'https://media.istockphoto.com/id/148421596/photo/traffic-jam-with-rows-of-cars.jpg?s=612x612&w=0&k=20&c=GeldRtTNo_vMfE7aHxhQY0QoV2DMyzi4LqTOLZL5svc='
   },
   {
     id: '4',
@@ -117,7 +117,7 @@ const initialReports: Report[] = [
     resolved: false,
     status: 'completed',
     lastUpdated: new Date(Date.now() - 43200000),
-    imageUrl: 'https://images.unsplash.com/photo-1503431760783-91f2569f6802?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cm9hZCUyMGNvbnN0cnVjdGlvbnxlbnwwfHwwfHx8MA%3D%3D'
+    imageUrl: 'https://www.thecleanwaterproject.com/assets/uploads/images/Garden.JPG'
   }
 ];
 
