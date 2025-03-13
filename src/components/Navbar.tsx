@@ -1,33 +1,32 @@
-
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import AuthDialog from './AuthDialog';
-import NotificationCenter from './NotificationCenter';
-import AreaSubscription from './AreaSubscription';
-import UserProfile from './UserProfile';
-import { 
-  Menu, 
-  X, 
-  AlertTriangle, 
-  Bell, 
-  User, 
-  LogOut, 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import AuthDialog from "./AuthDialog";
+import NotificationCenter from "./NotificationCenter";
+import AreaSubscription from "./AreaSubscription";
+import UserProfile from "./UserProfile";
+import {
+  Menu,
+  X,
+  AlertTriangle,
+  Bell,
+  User,
+  LogOut,
   Shield,
   MapPin,
   Award,
-  LayoutDashboard
-} from 'lucide-react';
+  LayoutDashboard,
+} from "lucide-react";
 
 const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -45,7 +44,7 @@ const Navbar = () => {
               <AlertTriangle className="h-6 w-6 text-primary" />
               <span className="text-xl font-bold">TrafficWise</span>
             </Link>
-            
+
             <nav className="hidden md:flex ml-6 gap-1">
               <Link to="/">
                 <Button variant="ghost" size="sm">
@@ -62,13 +61,6 @@ const Navbar = () => {
                   Report Issue
                 </Button>
               </a>
-              {isAuthenticated && (
-                <Link to="/dashboard">
-                  <Button variant="ghost" size="sm">
-                    My Dashboard
-                  </Button>
-                </Link>
-              )}
               <a href="#about">
                 <Button variant="ghost" size="sm">
                   About
@@ -76,24 +68,35 @@ const Navbar = () => {
               </a>
             </nav>
           </div>
-          
+
           <div className="hidden md:flex items-center gap-2">
             {isAuthenticated ? (
               <>
-                <Button 
-                  variant="outline" 
+                <Link to="/dashboard">
+                  <Button variant="outline" size="sm" className="bg-primary hover:bg-primary/90 text-white shadow-lg">
+                  <LayoutDashboard />
+                    Go to Dashboard
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
                   size="sm"
+                  className="shadow-sm"
                   onClick={() => setShowSubscribeDialog(true)}
                 >
                   <MapPin className="h-4 w-4 mr-2" />
                   Subscribe to Area
                 </Button>
-                
+
                 <NotificationCenter />
-                
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="relative h-8 w-8 rounded-full"
+                    >
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                           {user?.name.substring(0, 2).toUpperCase()}
@@ -105,36 +108,40 @@ const Navbar = () => {
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-0.5">
                         <p className="text-sm font-medium">{user?.name}</p>
-                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user?.email}
+                        </p>
                       </div>
                     </div>
-                    
+
                     <DropdownMenuSeparator />
-                    
+
                     <DropdownMenuItem asChild>
                       <Link to="/dashboard">
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                         <span>My Dashboard</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuItem onClick={() => setShowUserProfile(true)}>
                       <User className="mr-2 h-4 w-4" />
                       <span>My Profile</span>
                     </DropdownMenuItem>
-                    
-                    <DropdownMenuItem onClick={() => setShowSubscribeDialog(true)}>
+
+                    <DropdownMenuItem
+                      onClick={() => setShowSubscribeDialog(true)}
+                    >
                       <Bell className="mr-2 h-4 w-4" />
                       <span>Manage Alerts</span>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuItem asChild>
                       <Link to="/badges">
                         <Award className="mr-2 h-4 w-4" />
                         <span>My Badges</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     {isAdmin && (
                       <DropdownMenuItem asChild>
                         <Link to="/admin">
@@ -143,9 +150,9 @@ const Navbar = () => {
                         </Link>
                       </DropdownMenuItem>
                     )}
-                    
+
                     <DropdownMenuSeparator />
-                    
+
                     <DropdownMenuItem onClick={logout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Logout</span>
@@ -159,51 +166,75 @@ const Navbar = () => {
               </Button>
             )}
           </div>
-          
+
           <Button
             variant="ghost"
             size="sm"
             className="md:hidden"
             onClick={() => setShowMobileMenu(!showMobileMenu)}
           >
-            {showMobileMenu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {showMobileMenu ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </Button>
         </div>
       </div>
-      
+
       {/* Mobile menu */}
       {showMobileMenu && (
         <div className="md:hidden border-t border-gray-100 dark:border-gray-800">
           <div className="container mx-auto px-4 py-4 space-y-3">
             <Link to="/" onClick={() => setShowMobileMenu(false)}>
-              <Button variant="ghost" size="sm" className="w-full justify-start">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+              >
                 Home
               </Button>
             </Link>
             <a href="#reports" onClick={() => setShowMobileMenu(false)}>
-              <Button variant="ghost" size="sm" className="w-full justify-start">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+              >
                 Reports
               </Button>
             </a>
             <a href="#report-section" onClick={() => setShowMobileMenu(false)}>
-              <Button variant="ghost" size="sm" className="w-full justify-start">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+              >
                 Report Issue
               </Button>
             </a>
             {isAuthenticated && (
               <Link to="/dashboard" onClick={() => setShowMobileMenu(false)}>
-                <Button variant="ghost" size="sm" className="w-full justify-start">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                >
                   <LayoutDashboard className="h-4 w-4 mr-2" />
                   My Dashboard
                 </Button>
               </Link>
             )}
             <a href="#about" onClick={() => setShowMobileMenu(false)}>
-              <Button variant="ghost" size="sm" className="w-full justify-start">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+              >
                 About
               </Button>
             </a>
-            
+
             <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
               {isAuthenticated ? (
                 <div className="space-y-3">
@@ -215,13 +246,15 @@ const Navbar = () => {
                     </Avatar>
                     <div>
                       <p className="text-sm font-medium">{user?.name}</p>
-                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {user?.email}
+                      </p>
                     </div>
                   </div>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="w-full justify-start"
                     onClick={() => {
                       setShowSubscribeDialog(true);
@@ -231,10 +264,10 @@ const Navbar = () => {
                     <MapPin className="h-4 w-4 mr-2" />
                     Subscribe to Area
                   </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="w-full justify-start"
                     onClick={() => {
                       setShowUserProfile(true);
@@ -244,19 +277,23 @@ const Navbar = () => {
                     <User className="h-4 w-4 mr-2" />
                     My Profile
                   </Button>
-                  
+
                   {isAdmin && (
                     <Link to="/admin" onClick={() => setShowMobileMenu(false)}>
-                      <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start"
+                      >
                         <Shield className="h-4 w-4 mr-2" />
                         Admin Panel
                       </Button>
                     </Link>
                   )}
-                  
-                  <Button 
-                    variant="default" 
-                    size="sm" 
+
+                  <Button
+                    variant="default"
+                    size="sm"
                     className="w-full justify-start"
                     onClick={() => {
                       logout();
@@ -268,8 +305,8 @@ const Navbar = () => {
                   </Button>
                 </div>
               ) : (
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   className="w-full"
                   onClick={() => {
                     setShowAuthDialog(true);
@@ -283,19 +320,16 @@ const Navbar = () => {
           </div>
         </div>
       )}
-      
+
       {/* Auth Dialog */}
-      <AuthDialog 
-        isOpen={showAuthDialog}
-        onOpenChange={setShowAuthDialog}
-      />
-      
+      <AuthDialog isOpen={showAuthDialog} onOpenChange={setShowAuthDialog} />
+
       {/* Area Subscription Dialog */}
-      <AreaSubscription 
+      <AreaSubscription
         isOpen={showSubscribeDialog}
         onOpenChange={setShowSubscribeDialog}
       />
-      
+
       {/* User Profile Dialog */}
       <Dialog open={showUserProfile} onOpenChange={setShowUserProfile}>
         <DialogContent className="sm:max-w-[500px]">
