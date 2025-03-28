@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import {
   Dialog,
@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn, UserPlus, User } from "lucide-react";
+import { RootState, AppDispatch } from "../store/store";
+import { loginUser, registerUser } from '@/store/slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -21,12 +24,14 @@ interface AuthDialogProps {
 }
 
 const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onOpenChange }) => {
-  const { login, register, continueAsGuest, isLoading } = useAuth();
+  const { register, continueAsGuest, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("login");
   
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const loginResponse = useSelector((state: RootState) => state.auth);
   
   // Register form state
   const [registerName, setRegisterName] = useState("");
@@ -36,18 +41,23 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onOpenChange }) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(loginEmail, loginPassword);
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Login error:", error);
-    }
+      await dispatch(loginUser({ email: loginEmail, password: loginPassword })).unwrap();
+  } catch (error) {
+      console.error('Login failed:', error);
+  }
+
   };
+
+  useEffect(() => {
+    if (loginResponse.status !== null && loginResponse.status !== "error") {
+        onOpenChange(false);
+    }
+}, [loginResponse.status, onOpenChange]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register(registerName, registerEmail, registerPassword);
-      onOpenChange(false);
+      await dispatch(registerUser({ name: registerName, email: registerEmail, password: registerPassword })).unwrap();
     } catch (error) {
       console.error("Registration error:", error);
     }

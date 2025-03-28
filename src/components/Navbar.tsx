@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { RootState } from "@/store/store";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,13 +28,26 @@ import {
   Award,
   LayoutDashboard,
 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from '@/store/slices/authSlice';
+import { toast } from "sonner"; 
+
 
 const Navbar = () => {
-  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+  const isAuthenticated = useSelector(( state: RootState ) => state.auth.token);
+  const isAdmin = useSelector(( state: RootState ) => state.auth.user?.isAdmin ?? false);
+  const user = useSelector(( state: RootState ) => state.auth.user);
+
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    toast.success("Logged out successfully");
+  }
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-white/75 dark:bg-gray-900/75 border-b border-gray-100 dark:border-gray-800">
@@ -153,7 +167,7 @@ const Navbar = () => {
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem onClick={logout}>
+                    <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Logout</span>
                     </DropdownMenuItem>
@@ -296,7 +310,7 @@ const Navbar = () => {
                     size="sm"
                     className="w-full justify-start"
                     onClick={() => {
-                      logout();
+                      handleLogout();
                       setShowMobileMenu(false);
                     }}
                   >
