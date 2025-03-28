@@ -1,7 +1,11 @@
-
-import React, { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useAlerts, ReportType, AlertSeverity, Location } from '@/context/AlertsContext';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import {
+  useAlerts,
+  ReportType,
+  AlertSeverity,
+  Location,
+} from "@/context/AlertsContext";
 import {
   Card,
   CardContent,
@@ -28,37 +32,44 @@ import {
   Car,
   Upload,
   Camera,
-  XCircle
+  XCircle,
 } from "lucide-react";
-import AuthDialog from './AuthDialog';
+import AuthDialog from "./AuthDialog";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { createReport } from "@/store/slices/reportSlice";
+import { toast } from "sonner";
 
 interface ReportFormProps {
   userLocation?: Location;
 }
 
 const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
-  const { user, isAuthenticated } = useAuth();
-  const { addReport } = useAlerts();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  
+  const isAuthenticated = useSelector((state: RootState) => state.auth.token);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch<AppDispatch>();
+
   // Form state
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    type: 'pothole' as ReportType,
-    severity: 'medium' as AlertSeverity,
+    title: "",
+    description: "",
+    type: "pothole" as ReportType,
+    severity: "medium" as AlertSeverity,
     location: {
       lat: userLocation?.lat || 37.7749,
       lng: userLocation?.lng || -122.4194,
-      address: 'Current location'
+      address: "Current location",
     },
     imageFile: null as File | null,
-    imageUrl: '',
+    imageUrl: "",
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -69,15 +80,15 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result as string);
-        setFormData((prev) => ({ 
-          ...prev, 
+        setFormData((prev) => ({
+          ...prev,
           imageFile: file,
-          imageUrl: reader.result as string
+          imageUrl: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
@@ -86,36 +97,64 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
 
   const clearImage = () => {
     setPreviewImage(null);
-    setFormData((prev) => ({ 
-      ...prev, 
+    setFormData((prev) => ({
+      ...prev,
       imageFile: null,
-      imageUrl: ''
+      imageUrl: "",
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!isAuthenticated) {
       setAuthDialogOpen(true);
       return;
     }
-    
+
+    if (!formData.title || !formData.description || !formData.type || !formData.severity) {
+      toast.error('Please fill in all required fields.');
+      return;
+    }
+
+
     setIsSubmitting(true);
-    
-    setTimeout(() => {
+
       try {
+        let imgbbUrl = formData.imageUrl; 
+        if (formData.imageFile) {
+          const apiKey = import.meta.env.VITE_IMGBB_API_KEY;
+          const uploadFormData = new FormData();
+          uploadFormData.append('image', formData.imageFile);
+    
+          const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+            method: 'POST',
+            body: uploadFormData,
+          });
+    
+          if (!response.ok) {
+            throw new Error('ImgBB upload failed');
+          }
+    
+          const result = await response.json();
+          imgbbUrl = result.data.url;
+          setFormData((prev) => ({
+            ...prev,
+            imageUrl: imgbbUrl,
+          }));
+        };
+
         if (user) {
-          addReport({
+          const Data = {
             title: formData.title,
             description: formData.description,
             type: formData.type,
             severity: formData.severity,
             location: formData.location,
-            reportedBy: user.id,
-            imageUrl: formData.imageUrl
-          });
-          
+            reportedBy: user._id,
+            imageUrl: imgbbUrl,
+          };
+          dispatch(createReport(Data));
           // Clear form after submission
           setFormData({
             title: '',
@@ -134,11 +173,15 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
         }
       } catch (error) {
         console.error("Error submitting report:", error);
+        toast.error('Failed to submit report. Please try again.');
       } finally {
         setIsSubmitting(false);
       }
-    }, 1000);
   };
+
+  const isFormValid = () => {
+    return !!formData.title && !!formData.description && !!formData.type && !!formData.severity;
+};
 
   return (
     <>
@@ -149,7 +192,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
             Help other drivers by reporting road hazards, traffic, or accidents.
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -166,7 +209,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
                 className="glass-input"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="description" className="font-medium">
                 Description <span className="text-red-500">*</span>
@@ -182,15 +225,15 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
                 className="glass-input"
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="type" className="font-medium">
                   Issue Type <span className="text-red-500">*</span>
                 </Label>
-                <Select 
+                <Select
                   defaultValue={formData.type}
-                  onValueChange={(value) => handleSelectChange('type', value)}
+                  onValueChange={(value) => handleSelectChange("type", value)}
                 >
                   <SelectTrigger className="glass-input">
                     <SelectValue placeholder="Select issue type" />
@@ -229,28 +272,39 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="severity" className="font-medium">
                   Severity <span className="text-red-500">*</span>
                 </Label>
-                <Select 
+                <Select
                   defaultValue={formData.severity}
-                  onValueChange={(value) => handleSelectChange('severity', value as AlertSeverity)}
+                  onValueChange={(value) =>
+                    handleSelectChange("severity", value as AlertSeverity)
+                  }
                 >
                   <SelectTrigger className="glass-input">
                     <SelectValue placeholder="Select severity" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low" className="text-alert-low flex items-center gap-2">
+                    <SelectItem
+                      value="low"
+                      className="text-alert-low flex items-center gap-2"
+                    >
                       <div className="w-3 h-3 rounded-full bg-alert-low"></div>
                       <span>Low - Minor issue</span>
                     </SelectItem>
-                    <SelectItem value="medium" className="text-alert-medium flex items-center gap-2">
+                    <SelectItem
+                      value="medium"
+                      className="text-alert-medium flex items-center gap-2"
+                    >
                       <div className="w-3 h-3 rounded-full bg-alert-medium"></div>
                       <span>Medium - Caution needed</span>
                     </SelectItem>
-                    <SelectItem value="high" className="text-alert-high flex items-center gap-2">
+                    <SelectItem
+                      value="high"
+                      className="text-alert-high flex items-center gap-2"
+                    >
                       <div className="w-3 h-3 rounded-full bg-alert-high"></div>
                       <span>High - Dangerous</span>
                     </SelectItem>
@@ -258,7 +312,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
                 </Select>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="location" className="font-medium">
                 Location
@@ -274,30 +328,35 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                We're using your device's location. For privacy reasons, exact coordinates won't be shared publicly.
+                We're using your device's location. For privacy reasons, exact
+                coordinates won't be shared publicly.
               </p>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="image" className="font-medium">
                 Upload Image (Optional)
               </Label>
-              
+
               {!previewImage ? (
                 <div className="flex items-center justify-center w-full">
-                  <label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-primary hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <label
+                    htmlFor="image-upload"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:border-primary hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Camera className="w-8 h-8 mb-3 text-gray-500 dark:text-gray-400" />
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        <span className="font-medium">Click to upload</span> or drag and drop
+                        <span className="font-medium">Click to upload</span> or
+                        drag and drop
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         PNG, JPG or WEBP (MAX. 5MB)
                       </p>
                     </div>
-                    <Input 
-                      id="image-upload" 
-                      type="file" 
+                    <Input
+                      id="image-upload"
+                      type="file"
                       accept="image/*"
                       className="hidden"
                       onChange={handleImageUpload}
@@ -306,15 +365,15 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
                 </div>
               ) : (
                 <div className="relative">
-                  <img 
-                    src={previewImage} 
-                    alt="Preview" 
+                  <img
+                    src={previewImage}
+                    alt="Preview"
                     className="w-full h-48 object-cover rounded-lg"
                   />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="icon" 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
                     className="absolute top-2 right-2 bg-white dark:bg-gray-800 opacity-80 hover:opacity-100"
                     onClick={clearImage}
                   >
@@ -325,12 +384,12 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
             </div>
           </form>
         </CardContent>
-        
+
         <CardFooter className="flex justify-end">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             onClick={handleSubmit}
-            disabled={isSubmitting}
+            disabled={!isFormValid || isSubmitting}
             className="bg-primary hover:bg-primary/90 text-white"
           >
             {isSubmitting ? (
@@ -347,11 +406,8 @@ const ReportForm: React.FC<ReportFormProps> = ({ userLocation }) => {
           </Button>
         </CardFooter>
       </Card>
-      
-      <AuthDialog
-        isOpen={authDialogOpen}
-        onOpenChange={setAuthDialogOpen}
-      />
+
+      <AuthDialog isOpen={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );
 };

@@ -1,6 +1,5 @@
-
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -15,8 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn, UserPlus, User } from "lucide-react";
 import { RootState, AppDispatch } from "../store/store";
-import { loginUser, registerUser } from '@/store/slices/authSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, registerUser } from "@/store/slices/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
 
 interface AuthDialogProps {
   isOpen: boolean;
@@ -26,13 +26,14 @@ interface AuthDialogProps {
 const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onOpenChange }) => {
   const { register, continueAsGuest, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("login");
-  
+
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const loginResponse = useSelector((state: RootState) => state.auth);
-  
+  const token = useSelector((state: RootState) => state.auth.token);
+
   // Register form state
   const [registerName, setRegisterName] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
@@ -41,23 +42,36 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onOpenChange }) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await dispatch(loginUser({ email: loginEmail, password: loginPassword })).unwrap();
-  } catch (error) {
-      console.error('Login failed:', error);
-  }
-
+      if (token) {
+        toast.error("You are already logged in.");
+        return;
+      } else {
+        await dispatch(
+          loginUser({ email: loginEmail, password: loginPassword })
+        ).unwrap();
+        
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   useEffect(() => {
     if (loginResponse.status !== null && loginResponse.status !== "error") {
-        onOpenChange(false);
+      onOpenChange(false);
     }
-}, [loginResponse.status, onOpenChange]);
+  }, [loginResponse.status, onOpenChange]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await dispatch(registerUser({ name: registerName, email: registerEmail, password: registerPassword })).unwrap();
+      await dispatch(
+        registerUser({
+          name: registerName,
+          email: registerEmail,
+          password: registerPassword,
+        })
+      ).unwrap();
     } catch (error) {
       console.error("Registration error:", error);
     }
@@ -72,13 +86,20 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onOpenChange }) => {
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] border-none shadow-xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">Welcome to TrafficWise</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">
+            Welcome to TrafficWise
+          </DialogTitle>
           <DialogDescription className="text-center">
             Join our community of drivers helping each other navigate safely.
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs
+          defaultValue="login"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="login" className="flex items-center gap-1">
               <LogIn className="h-4 w-4" />
@@ -121,11 +142,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onOpenChange }) => {
                   className="glass-input"
                 />
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
@@ -175,11 +192,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ isOpen, onOpenChange }) => {
                   className="glass-input"
                 />
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
