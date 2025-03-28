@@ -20,6 +20,8 @@ import {
   MapPin
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 interface NotificationCenterProps {
   className?: string;
@@ -40,8 +42,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ className }) =>
     toggleEmailNotifications,
     hasPermission,
   } = useNotifications();
-  const { user, isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
+  const isAuthenticated = useSelector(( state: RootState ) => state.auth.token);
+  const user = useSelector(( state: RootState ) => state.auth.user);
   
   const handleReadAll = () => {
     markAllAsRead();
