@@ -61,7 +61,7 @@ const Navbar = () => {
 
             <nav className="hidden md:flex ml-6 gap-1">
               <Link to="/">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
                   Home
                 </Button>
               </Link>
