@@ -14,15 +14,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search, AlertTriangle, Construction, Car, Filter } from 'lucide-react';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from "react-redux"
+import { fetchReports } from '@/store/slices/reportSlice';
+import { AppDispatch, RootState } from '@/store/store';
+
+
 
 const Index = () => {
-  const { reports } = useAlerts();
   const { isAuthenticated } = useAuth();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string>('all');
   const [filterSeverity, setFilterSeverity] = useState<string | null>(null);
   const [showHeroSection, setShowHeroSection] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const reports =useSelector(( state: RootState ) => state.report.reports)
+
+  useEffect(() => {
+    dispatch(fetchReports());
+  })
 
   // Check if user is at the top of the page
   useEffect(() => {
@@ -223,8 +233,8 @@ const Index = () => {
           {/* Reports Grid */}
           {filteredReports.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredReports.map((report) => (
-                <div key={report.id} className="animate-fade-up">
+              {filteredReports.map((report, id) => (
+                <div key={id} className="animate-fade-up">
                   <AlertCard report={report} />
                 </div>
               ))}
