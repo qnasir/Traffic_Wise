@@ -7,13 +7,10 @@ import { toast } from 'sonner';
 // Fetch reports
 export const fetchReports = createAsyncThunk(
   'report/fetchReports',
-   async (creadentials: Report) => {
-    console.log("creadentials", creadentials);
-    return;
+   async () => {
           try {
-              const response = await axios.post('/api/users/login', creadentials);
+              const response = await axios.get('/api/reports');
               return response.data;
-  
           } catch (error) {
               console.log("error", error);
           }
@@ -72,7 +69,6 @@ const reportSlice = createSlice({
       // Create report
       .addCase(createReport.fulfilled, (state, action: PayloadAction<Report>) => {
         state.loading = false;
-        state.reports.push(action.payload);
         toast.success("Issue reported successfully")
       })
       .addCase(createReport.rejected, (state, action) => {

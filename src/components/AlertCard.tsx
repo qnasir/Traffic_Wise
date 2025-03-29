@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Report, useAlerts, ReportStatus } from '@/context/AlertsContext';
+import { useAlerts, ReportStatus } from '@/context/AlertsContext';
+import { Report } from "@/types/report.types"
 import { 
   Card, 
   CardContent, 
@@ -170,7 +171,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ report }) => {
             variant="ghost" 
             size="sm"
             className="text-gray-500 dark:text-gray-400 hover:text-primary"
-            onClick={() => upvoteReport(report.id)}
+            onClick={() => upvoteReport(report._id)}
           >
             <ThumbsUp className="w-4 h-4 mr-1" />
             <span>{report.upvotes}</span>
@@ -180,7 +181,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ report }) => {
             variant="ghost" 
             size="sm"
             className="text-gray-500 dark:text-gray-400 hover:text-destructive"
-            onClick={() => downvoteReport(report.id)}
+            onClick={() => downvoteReport(report._id)}
           >
             <ThumbsDown className="w-4 h-4 mr-1" />
             <span>{report.downvotes}</span>
@@ -191,7 +192,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ report }) => {
           <Button
             variant="outline"
             size="sm" 
-            onClick={() => markAsResolved(report.id)}
+            onClick={() => markAsResolved(report._id)}
           >
             <Check className="w-4 h-4 mr-1" />
             <span>Mark Resolved</span>
